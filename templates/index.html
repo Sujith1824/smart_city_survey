@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Idikarai Development Survey</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at 10% 20%, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+      padding: 30px 20px;
+      position: relative;
+    }
+
+    /* Ambient Background Glows */
+    .glow {
+      position: fixed;
+      width: 350px;
+      height: 350px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.25), rgba(168, 85, 247, 0.25));
+      filter: blur(80px);
+      z-index: 0;
+      animation: pulseGlow 8s ease-in-out infinite alternate;
+    }
+    .glow-1 { top: -50px; left: -50px; }
+    .glow-2 { bottom: -50px; right: -50px; animation-delay: -4s; }
+
+    @keyframes pulseGlow {
+      0% { transform: scale(1) translate(0, 0); }
+      100% { transform: scale(1.2) translate(30px, -30px); }
+    }
+
+    /* Floating Bubbles */
+    .bubble-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .bubble {
+      position: absolute;
+      bottom: -150px;
+      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05));
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+      border-radius: 50%;
+      animation: floatUp 14s infinite linear;
+    }
+
+    .bubble:nth-child(1) { width: 90px; height: 90px; left: 10%; animation-duration: 12s; }
+    .bubble:nth-child(2) { width: 130px; height: 130px; left: 65%; animation-duration: 18s; animation-delay: -2s; }
+    .bubble:nth-child(3) { width: 50px; height: 50px; left: 35%; animation-duration: 9s; animation-delay: -5s; }
+    .bubble:nth-child(4) { width: 110px; height: 110px; left: 85%; animation-duration: 16s; animation-delay: -7s; }
+    .bubble:nth-child(5) { width: 70px; height: 70px; left: 50%; animation-duration: 11s; animation-delay: -3s; }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0; }
+      10% { opacity: 0.8; }
+      90% { opacity: 0.8; }
+      100% { transform: translateY(-125vh) rotate(360deg) scale(1.2); opacity: 0; }
+    }
+
+    /* Main Floating Container Card */
+    .container {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 520px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 28px;
+      padding: 35px 30px;
+      color: white;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4),
+                  inset 0 1px 1px rgba(255, 255, 255, 0.3);
+      animation: floatCard 6s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatCard {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-10px); }
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ffffff, #93c5fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    p.subtitle {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #cbd5e1;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: #e2e8f0;
+      text-transform: uppercase;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.4);
+      color: #ffffff;
+      font-size: 15px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #60a5fa;
+      background: rgba(15, 23, 42, 0.7);
+      box-shadow: 0 0 18px rgba(96, 165, 250, 0.35);
+      transform: translateY(-1px);
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: #94a3b8;
+    }
+
+    option {
+      background-color: #1e293b;
+      color: #ffffff;
+    }
+
+    textarea {
+      resize: none;
+      height: 90px;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 25px -5px rgba(34, 197, 94, 0.4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    button[type="submit"]:hover {
+      transform: translateY(-3px) scale(1.01);
+      box-shadow: 0 15px 30px -5px rgba(34, 197, 94, 0.6);
+      background: linear-gradient(135deg, #28d867, #15803d);
+    }
+
+    .status {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 14px;
+      min-height: 20px;
+    }
+
+    /* Next Page / Success Screen */
+    #successPage {
+      display: none;
+      text-align: center;
+      padding: 20px 10px;
+      animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    .success-icon {
+      width: 85px;
+      height: 85px;
+      background: linear-gradient(135deg, #22c55e, #15803d);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto 20px auto;
+      box-shadow: 0 0 35px rgba(34, 197, 94, 0.6);
+      animation: bounce 1.2s ease infinite alternate;
+    }
+
+    .success-icon svg {
+      width: 48px;
+      height: 48px;
+      fill: white;
+    }
+
+    #successPage h2 {
+      font-size: 28px;
+      margin-bottom: 12px;
+      color: #ffffff;
+    }
+
+    #successPage p {
+      color: #cbd5e1;
+      font-size: 15px;
+      line-height: 1.5;
+      margin-bottom: 28px;
+    }
+
+    .btn-reset {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: white;
+      padding: 14px 28px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 15px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-reset:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
+    }
+
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.85); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes bounce {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-10px); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Glowing Orbs -->
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+
+  <!-- Animated Floating Bubbles -->
+  <div class="bubble-container">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+  </div>
+
+  <div class="container">
+    
+    <!-- PAGE 1: Survey Form View -->
+    <div id="surveyPage">
+      <h1>Idikarai Development Survey</h1>
+      <p class="subtitle">Help improve roads, water, street lights and public services</p>
+
+      <form id="surveyForm">
+
+        <div class="input-group">
+          <label>Street Name</label>
+          <input type="text" id="street_name" placeholder="Enter street name" required>
+        </div>
+
+        <div class="input-group">
+          <label>People in House</label>
+          <input type="number" id="people_in_house" placeholder="Enter number" required min="1">
+        </div>
+
+        <div class="input-group">
+          <label>Water Available Daily</label>
+          <select id="water_available_daily" required>
+            <option value="">Select Option</option>
+            <option>Yes</option>
+            <option>No</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Road Condition</label>
+          <select id="road_condition" required>
+            <option value="">Select Condition</option>
+            <option>Good</option>
+            <option>Average</option>
+            <option>Poor</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Street Light Condition</label>
+          <select id="street_light_condition" required>
+            <option value="">Select Condition</option>
+            <option>Good</option>
+            <option>Average</option>
+            <option>Poor</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Waste Collected Regularly</label>
+          <select id="waste_collected_regularly" required>
+            <option value="">Select Option</option>
+            <option>Yes</option>
+            <option>No</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Drainage Problem</label>
+          <select id="drainage_problem" required>
+            <option value="">Select Option</option>
+            <option>Yes</option>
+            <option>No</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Main Complaint</label>
+          <textarea id="main_complaint" placeholder="Enter your main complaint or feedback..."></textarea>
+        </div>
+
+        <button type="submit" id="submitBtn">
+          <span>Submit Survey</span>
+        </button>
+
+        <div class="status" id="status"></div>
+
+      </form>
+    </div>
+
+    <!-- PAGE 2: Submission Success View -->
+    <div id="successPage">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+        </svg>
+      </div>
+      <h2>Submitted Successfully!</h2>
+      <p>Thank you for contributing to the Idikarai Development Survey. Your responses have been saved.</p>
+      <button class="btn-reset" onclick="navigateToSurvey()">Fill Out Another Survey</button>
+    </div>
+
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://ifrmyjdexwxlrosywnpd.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_WwKyyYMkTm2TgGHHbrFCEw_gLyiwj3b";
+
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const form = document.getElementById("surveyForm");
+    const status = document.getElementById("status");
+    const submitBtn = document.getElementById("submitBtn");
+    
+    const surveyPage = document.getElementById("surveyPage");
+    const successPage = document.getElementById("successPage");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      status.style.color = "#93c5fd";
+      status.innerHTML = "⏳ Submitting data...";
+      submitBtn.style.opacity = "0.6";
+      submitBtn.disabled = true;
+
+      try {
+        const data = {
+          street_name: document.getElementById("street_name").value,
+          people_in_house: parseInt(document.getElementById("people_in_house").value),
+          water_available_daily: document.getElementById("water_available_daily").value,
+          road_condition: document.getElementById("road_condition").value,
+          street_light_condition: document.getElementById("street_light_condition").value,
+          waste_collected_regularly: document.getElementById("waste_collected_regularly").value,
+          drainage_problem: document.getElementById("drainage_problem").value,
+          main_complaint: document.getElementById("main_complaint").value
+        };
+
+        const { error } = await client
+          .from("smart_city_survey")
+          .insert([data]);
+
+        if (error) {
+          throw error;
+        }
+
+        // Reset form & status
+        form.reset();
+        status.innerHTML = "";
+
+        // DIRECT DISPLAY SWITCH (Guaranteed)
+        surveyPage.style.display = "none";
+        successPage.style.display = "block";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      } catch (err) {
+        status.style.color = "#fca5a5";
+        status.innerHTML = "❌ " + (err.message || "Failed to submit. Please try again.");
+      } finally {
+        submitBtn.style.opacity = "1";
+        submitBtn.disabled = false;
+      }
+    });
+
+    function navigateToSurvey() {
+      successPage.style.display = "none";
+      surveyPage.style.display = "block";
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+
+</body>
+</html>
