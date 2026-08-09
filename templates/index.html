@@ -3,574 +3,1385 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Idikarai Development Survey</title>
-
+  <title>UrbanPulse Hub</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    :root {
+      --bg-primary: #020408;
+      --bg-secondary: rgba(255,255,255,0.05);
+      --bg-card: rgba(30,41,59,0.95);
+      --text-primary: #e2e8f0;
+      --text-secondary: #94a3b8;
+      --accent: #00f0ff;
+      --accent-glow: rgba(0,240,255,0.3);
+      --accent-secondary: #39ff14;
+      --border: rgba(255,255,255,0.12);
+      --glass: rgba(255,255,255,0.05);
+      --shadow: rgba(0,0,0,0.4);
+      --input-bg: rgba(15,23,42,0.5);
+    }
+    [data-theme="light"] {
+      --bg-primary: #f0f4f8;
+      --bg-secondary: rgba(255,255,255,0.8);
+      --bg-card: rgba(255,255,255,0.95);
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --accent: #0284c7;
+      --accent-glow: rgba(2,132,199,0.3);
+      --accent-secondary: #16a34a;
+      --border: rgba(0,0,0,0.1);
+      --glass: rgba(255,255,255,0.6);
+      --shadow: rgba(0,0,0,0.1);
+      --input-bg: rgba(255,255,255,0.7);
     }
 
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
-      background: radial-gradient(circle at 10% 20%, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      background: var(--bg-primary);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text-primary);
       overflow-x: hidden;
-      padding: 30px 20px;
-      position: relative;
+      transition: background 0.5s ease, color 0.5s ease;
     }
 
-    /* Ambient Background Glows */
-    .glow {
+    /* ===== NAVIGATION ===== */
+    .navbar {
       position: fixed;
-      width: 350px;
-      height: 350px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, rgba(37, 99, 235, 0.25), rgba(168, 85, 247, 0.25));
-      filter: blur(80px);
-      z-index: 0;
-      animation: pulseGlow 8s ease-in-out infinite alternate;
-    }
-    .glow-1 { top: -50px; left: -50px; }
-    .glow-2 { bottom: -50px; right: -50px; animation-delay: -4s; }
-
-    @keyframes pulseGlow {
-      0% { transform: scale(1) translate(0, 0); }
-      100% { transform: scale(1.2) translate(30px, -30px); }
-    }
-
-    /* Floating Bubbles */
-    .bubble-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    .bubble {
-      position: absolute;
-      bottom: -150px;
-      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05));
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-      border-radius: 50%;
-      animation: floatUp 14s infinite linear;
-    }
-
-    .bubble:nth-child(1) { width: 90px; height: 90px; left: 10%; animation-duration: 12s; }
-    .bubble:nth-child(2) { width: 130px; height: 130px; left: 65%; animation-duration: 18s; animation-delay: -2s; }
-    .bubble:nth-child(3) { width: 50px; height: 50px; left: 35%; animation-duration: 9s; animation-delay: -5s; }
-    .bubble:nth-child(4) { width: 110px; height: 110px; left: 85%; animation-duration: 16s; animation-delay: -7s; }
-    .bubble:nth-child(5) { width: 70px; height: 70px; left: 50%; animation-duration: 11s; animation-delay: -3s; }
-
-    @keyframes floatUp {
-      0% { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0; }
-      10% { opacity: 0.8; }
-      90% { opacity: 0.8; }
-      100% { transform: translateY(-125vh) rotate(360deg) scale(1.2); opacity: 0; }
-    }
-
-    /* Main Floating Container Card */
-    .container {
-      position: relative;
-      z-index: 10;
-      width: 100%;
-      max-width: 520px;
-      background: rgba(255, 255, 255, 0.07);
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 28px;
+      background: rgba(2,4,8,0.7);
       backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-radius: 28px;
-      padding: 35px 30px;
-      color: white;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4),
-                  inset 0 1px 1px rgba(255, 255, 255, 0.3);
-      animation: floatCard 6s ease-in-out infinite alternate;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.5s ease;
     }
-
-    @keyframes floatCard {
-      0% { transform: translateY(0px); }
-      100% { transform: translateY(-10px); }
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 8px;
-      font-size: 28px;
+    [data-theme="light"] .navbar { background: rgba(240,244,248,0.8); }
+    .nav-brand {
+      font-size: 20px;
       font-weight: 700;
-      background: linear-gradient(135deg, #ffffff, #93c5fd);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: -0.5px;
+      color: var(--accent);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-shadow: 0 0 15px var(--accent-glow);
     }
-
-    p.subtitle {
-      text-align: center;
-      margin-bottom: 25px;
-      color: #cbd5e1;
-      font-size: 14px;
-      line-height: 1.4;
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
     }
-
-    .input-group {
-      margin-bottom: 20px;
-      position: relative;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
+    .nav-btn {
+      padding: 8px 18px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-secondary);
       font-size: 13px;
       font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      text-transform: uppercase;
       letter-spacing: 0.5px;
-      color: #e2e8f0;
+    }
+    .nav-btn:hover, .nav-btn.active {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: var(--accent-glow);
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+    .theme-toggle {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--glass);
+      color: var(--text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: all 0.3s ease;
+      margin-left: 8px;
+    }
+    .theme-toggle:hover {
+      transform: rotate(20deg) scale(1.1);
+      border-color: var(--accent);
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    /* ===== HERO / 3D CITY ===== */
+    .hero {
+      position: relative;
+      height: 100vh;
+      width: 100%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #hero-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 20px;
+      max-width: 700px;
+      pointer-events: none;
+    }
+    .hero-content h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      text-shadow: 0 0 30px rgba(0,240,255,0.5), 0 4px 20px rgba(0,0,0,0.5);
+      margin-bottom: 12px;
+      animation: fadeUp 1s ease forwards;
+      opacity: 0;
+    }
+    .hero-content p {
+      font-size: clamp(14px, 2vw, 18px);
+      color: var(--accent);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px rgba(0,240,255,0.3);
+      margin-bottom: 32px;
+      animation: fadeUp 1s ease 0.2s forwards;
+      opacity: 0;
+    }
+    .hero-cta {
+      pointer-events: auto;
+      padding: 14px 36px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, var(--accent), #0ea5e9);
+      color: #000;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 24px var(--accent-glow);
+      text-decoration: none;
+      display: inline-block;
+      animation: fadeUp 1s ease 0.4s forwards;
+      opacity: 0;
+    }
+    .hero-cta:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px var(--accent-glow);
+    }
+    .scroll-indicator {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      animation: bounce 2s infinite;
+      color: var(--text-secondary);
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .scroll-indicator svg {
+      width: 24px;
+      height: 24px;
+      stroke: var(--accent);
+    }
+
+    /* ===== SECTIONS ===== */
+    .section {
+      position: relative;
+      z-index: 20;
+      padding: 80px 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .section-title {
+      text-align: center;
+      font-size: clamp(24px, 4vw, 36px);
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+      letter-spacing: 2px;
+    }
+    .section-subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 15px;
+      margin-bottom: 50px;
+      letter-spacing: 1px;
+    }
+
+    /* ===== QUOTES ===== */
+    .quotes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+    .quote-card {
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s ease;
+    }
+    .quote-card::before {
+      content: '"';
+      position: absolute;
+      top: 10px;
+      left: 16px;
+      font-size: 80px;
+      color: var(--accent);
+      opacity: 0.15;
+      font-family: Georgia, serif;
+      line-height: 1;
+    }
+    .quote-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--accent);
+      box-shadow: 0 20px 40px var(--shadow);
+    }
+    .quote-text {
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--text-primary);
+      font-style: italic;
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
+    }
+    .quote-author {
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: 600;
+      letter-spacing: 1px;
       text-transform: uppercase;
     }
 
-    input, select, textarea {
+    /* ===== IMPACT CARDS ===== */
+    .impact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 28px;
+    }
+    .impact-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      transition: all 0.4s ease;
+      box-shadow: 0 10px 30px var(--shadow);
+    }
+    .impact-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 50px var(--shadow);
+      border-color: var(--accent);
+    }
+    .impact-img {
       width: 100%;
-      padding: 14px 16px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 14px;
-      background: rgba(15, 23, 42, 0.4);
-      color: #ffffff;
-      font-size: 15px;
+      height: 200px;
+      object-fit: cover;
+      display: block;
+    }
+    .impact-body {
+      padding: 24px;
+    }
+    .impact-body h3 {
+      font-size: 18px;
+      color: var(--accent);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .impact-body p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+    }
+
+    /* ===== SURVEY SECTION ===== */
+    .survey-section {
+      position: relative;
+      z-index: 20;
+      padding: 60px 16px;
+    }
+    .form-wrap {
+      max-width: 540px;
+      margin: 0 auto;
+    }
+    .form-card {
+      background: var(--glass);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 20px 50px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .form-card h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: 1px;
+    }
+    .row { 
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: 14px; 
+      align-items: start;
+    }
+    @media (max-width: 520px) { 
+      .row { grid-template-columns: 1fr; } 
+    }
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.6px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+    .field input, .field select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--input-bg);
+      color: var(--text-primary);
+      font-size: 14px;
       outline: none;
-      transition: all 0.3s ease;
+      transition: all 0.25s ease;
+      font-family: inherit;
     }
-
-    input:focus, select:focus, textarea:focus {
-      border-color: #60a5fa;
-      background: rgba(15, 23, 42, 0.7);
-      box-shadow: 0 0 18px rgba(96, 165, 250, 0.35);
-      transform: translateY(-1px);
+    .field input:focus, .field select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 16px var(--accent-glow);
+      background: var(--input-bg);
     }
-
-    input::placeholder, textarea::placeholder {
-      color: #94a3b8;
+    .field input::placeholder { color: var(--text-secondary); opacity: 0.7; }
+    .field option { background: var(--bg-card); color: var(--text-primary); }
+    
+    .complaint-field {
+      position: relative;
+      margin-bottom: 14px;
+      margin-top: 4px;
     }
-
-    option {
-      background-color: #1e293b;
-      color: #ffffff;
+    .complaint-field label {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.6px;
+      color: var(--accent);
+      text-transform: uppercase;
     }
-
-    textarea {
-      resize: none;
-      height: 90px;
-    }
-
-    button[type="submit"] {
+    .complaint-field textarea {
       width: 100%;
-      padding: 16px;
+      min-height: 100px;
+      padding: 16px 18px;
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--input-bg) 0%, rgba(15,23,42,0.3) 100%);
+      color: var(--text-primary);
+      font-size: 14px;
+      line-height: 1.6;
+      outline: none;
+      resize: vertical;
+      font-family: inherit;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px var(--accent-glow);
+    }
+    .complaint-field textarea::placeholder {
+      color: var(--text-secondary);
+      opacity: 0.6;
+      font-style: italic;
+    }
+    .complaint-field textarea:focus {
+      border-color: var(--accent);
+      border-left-width: 4px;
+      box-shadow: 0 0 25px var(--accent-glow);
+    }
+    
+    .submit-btn {
+      width: 100%;
+      padding: 15px;
       border: none;
-      border-radius: 16px;
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      color: white;
-      font-size: 16px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), #0ea5e9);
+      color: #000;
+      font-size: 15px;
       font-weight: 700;
       cursor: pointer;
       transition: all 0.3s ease;
-      box-shadow: 0 10px 25px -5px rgba(34, 197, 94, 0.4);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-      margin-top: 10px;
+      box-shadow: 0 8px 24px var(--accent-glow);
+      margin-top: 4px;
+      font-family: inherit;
     }
-
-    button[type="submit"]:hover {
-      transform: translateY(-3px) scale(1.01);
-      box-shadow: 0 15px 30px -5px rgba(34, 197, 94, 0.6);
-      background: linear-gradient(135deg, #28d867, #15803d);
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px var(--accent-glow);
     }
-
+    .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
     .status {
-      margin-top: 15px;
+      margin-top: 14px;
       text-align: center;
+      font-size: 13px;
       font-weight: 600;
-      font-size: 14px;
-      min-height: 20px;
+      min-height: 18px;
+    }
+    .mode-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+    .mode-local {
+      background: rgba(234, 179, 8, 0.15);
+      color: #facc15;
+      border: 1px solid rgba(234, 179, 8, 0.25);
+    }
+    .mode-live {
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.25);
     }
 
-    /* Enhanced Innovative Success Screen */
-    #successPage {
+    .success-view {
       display: none;
       text-align: center;
-      padding: 20px 10px;
-      position: relative;
-      overflow: hidden;
-      animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      padding: 30px 10px;
+      animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     }
-
-    /* Floating Success Card Animation Effect */
-    .success-card-content {
-      animation: levitateSuccess 4s ease-in-out infinite alternate;
-    }
-
-    @keyframes levitateSuccess {
-      0% { transform: translateY(0px) rotate(0deg); }
-      100% { transform: translateY(-8px) rotate(0.5deg); }
-    }
-
-    /* Success Icon with Glowing Ripple and Levitation */
-    .success-icon-wrapper {
-      position: relative;
-      width: 100px;
-      height: 100px;
-      margin: 0 auto 25px auto;
-      animation: pulseIconWrapper 3s ease-in-out infinite alternate;
-    }
-
-    @keyframes pulseIconWrapper {
-      0% { transform: scale(0.95); }
-      100% { transform: scale(1.05); }
-    }
-
     .success-icon {
-      position: relative;
-      width: 100px;
-      height: 100px;
-      background: linear-gradient(135deg, #22c55e, #15803d);
+      width: 75px;
+      height: 75px;
+      background: linear-gradient(135deg, var(--accent), #0ea5e9);
       border-radius: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 2;
-      box-shadow: 0 0 45px rgba(34, 197, 94, 0.7),
-                  inset 0 2px 5px rgba(255, 255, 255, 0.4);
-      animation: scaleUpIcon 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.1s both;
+      margin: 0 auto 18px;
+      box-shadow: 0 0 30px var(--accent-glow);
+      animation: bounce 1.2s ease infinite alternate;
     }
-
-    /* Expanding Multi-layered Pulse Ripples */
-    .success-icon-wrapper::before,
-    .success-icon-wrapper::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      border-radius: 50%;
-      border: 2px solid rgba(34, 197, 94, 0.6);
-      animation: rippleEffect 2.2s infinite ease-out;
-      z-index: 1;
-    }
-    .success-icon-wrapper::after {
-      animation-delay: 1.1s;
-    }
-
-    @keyframes rippleEffect {
-      0% { transform: scale(1); opacity: 1; }
-      100% { transform: scale(2.2); opacity: 0; }
-    }
-
-    @keyframes scaleUpIcon {
-      0% { transform: scale(0); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-
-    .success-icon svg {
-      width: 52px;
-      height: 52px;
-      fill: white;
-      stroke-dasharray: 50;
-      stroke-dashoffset: 50;
-      animation: drawCheck 0.6s ease-in-out 0.4s forwards, floatCheckIcon 2s ease-in-out infinite alternate;
-    }
-
-    @keyframes floatCheckIcon {
-      0% { transform: translateY(0px); }
-      100% { transform: translateY(-4px); }
-    }
-
-    @keyframes drawCheck {
-      to { stroke-dashoffset: 0; }
-    }
-
-    #successPage h2 {
-      font-size: 30px;
-      margin-bottom: 12px;
-      background: linear-gradient(135deg, #ffffff, #86efac);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: slideUpFade 0.5s ease 0.3s both;
-    }
-
-    #successPage p {
-      color: #cbd5e1;
-      font-size: 15px;
-      line-height: 1.5;
-      margin-bottom: 28px;
-      animation: slideUpFade 0.5s ease 0.4s both;
-    }
-
-    .btn-reset {
-      background: rgba(255, 255, 255, 0.12);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      color: white;
-      padding: 14px 28px;
-      border-radius: 14px;
+    .success-icon svg { width: 40px; height: 40px; fill: #000; }
+    .success-view h3 { font-size: 22px; margin-bottom: 8px; color: var(--text-primary); }
+    .success-view p { color: var(--text-secondary); font-size: 14px; margin-bottom: 24px; line-height: 1.5; }
+    .btn-secondary {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 12px 24px;
+      border-radius: 12px;
       cursor: pointer;
       font-weight: 600;
-      font-size: 15px;
+      font-size: 14px;
       transition: all 0.3s ease;
-      animation: slideUpFade 0.5s ease 0.5s both;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      font-family: inherit;
+    }
+    .btn-secondary:hover { background: var(--border); transform: translateY(-2px); }
+    .btn-view {
+      background: rgba(96, 165, 250, 0.12);
+      border: 1px solid rgba(96, 165, 250, 0.25);
+      color: #93c5fd;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.3s ease;
+      margin-top: 12px;
+      font-family: inherit;
+    }
+    .btn-view:hover { background: rgba(96, 165, 250, 0.25); transform: translateY(-2px); }
+
+    /* ===== MODALS ===== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(12px);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      animation: fadeIn 0.3s ease;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+      max-width: 560px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      color: var(--text-primary);
+      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      box-shadow: 0 25px 60px var(--shadow);
+    }
+    .modal-box h2 {
+      font-size: 22px;
+      margin-bottom: 16px;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .modal-box h3 {
+      font-size: 16px;
+      color: #93c5fd;
+      margin-top: 20px;
+      margin-bottom: 8px;
+    }
+    .modal-box p, .modal-box li {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+    }
+    .modal-box ul { margin-left: 20px; margin-bottom: 12px; }
+    .modal-box li { margin-bottom: 6px; }
+    .modal-close {
+      position: absolute;
+      top: 16px; right: 16px;
+      background: var(--glass);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    .modal-close:hover { background: var(--border); color: #f87171; }
+
+    #dataModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(12px);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .modal-box.data-box { padding: 24px; }
+    .modal-box.data-box h3 {
+      margin-bottom: 16px;
+      font-size: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-primary);
+    }
+    .close-btn {
+      background: var(--glass);
+      border: none;
+      color: var(--text-primary);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .close-btn:hover { background: var(--border); }
+    .entry {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .entry-header {
+      font-weight: 700;
+      color: #93c5fd;
+      margin-bottom: 8px;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .entry-time { font-weight: 400; color: var(--text-secondary); font-size: 11px; }
+    .entry-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .entry-grid span {
+      background: var(--glass);
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+    .entry-complaint {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--text-primary);
+      font-style: italic;
+      background: var(--glass);
+      padding: 8px;
+      border-radius: 6px;
+    }
+    .empty { text-align: center; color: var(--text-secondary); padding: 30px; font-size: 13px; }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      text-align: center;
+      padding: 40px 20px;
+      border-top: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 13px;
+      letter-spacing: 1px;
     }
 
-    .btn-reset:hover {
-      background: rgba(255, 255, 255, 0.25);
-      transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 8px 25px rgba(255, 255, 255, 0.15);
-    }
-
-    @keyframes slideUpFade {
-      0% { opacity: 0; transform: translateY(15px); }
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeUp {
+      0% { opacity: 0; transform: translateY(30px); }
       100% { opacity: 1; transform: translateY(0); }
     }
-
-    /* Floating Orbs / Confetti Particle Burst Effect */
-    .confetti {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      background: #22c55e;
-      top: 45%;
-      left: 50%;
-      border-radius: 50%;
-      pointer-events: none;
-      opacity: 0;
-      box-shadow: 0 0 10px currentColor;
-    }
-
     @keyframes popIn {
       0% { opacity: 0; transform: scale(0.85); }
       100% { opacity: 1; transform: scale(1); }
     }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
   </style>
 </head>
-<body>
+<body data-theme="dark">
 
-  <!-- Ambient Glowing Orbs -->
-  <div class="glow glow-1"></div>
-  <div class="glow glow-2"></div>
-
-  <!-- Animated Floating Bubbles -->
-  <div class="bubble-container">
-    <div class="bubble"></div>
-    <div class="bubble"></div>
-    <div class="bubble"></div>
-    <div class="bubble"></div>
-    <div class="bubble"></div>
-  </div>
-
-  <div class="container">
-    
-    <!-- PAGE 1: Survey Form View -->
-    <div id="surveyPage">
-      <h1>SMART CITY HUB</h1>
-      <p class="subtitle">Help improve roads, water, street lights and public services</p>
-
-      <form id="surveyForm">
-
-        <div class="input-group">
-          <label>Street Name</label>
-          <input type="text" id="street_name" placeholder="Enter street name" required>
-        </div>
-
-        <div class="input-group">
-          <label>People in House</label>
-          <input type="number" id="people_in_house" placeholder="Enter number" required min="1">
-        </div>
-
-        <div class="input-group">
-          <label>Water Available Daily</label>
-          <select id="water_available_daily" required>
-            <option value="">Select Option</option>
-            <option>Yes</option>
-            <option>No</option>
-          </select>
-        </div>
-
-        <div class="input-group">
-          <label>Road Condition</label>
-          <select id="road_condition" required>
-            <option value="">Select Condition</option>
-            <option>Good</option>
-            <option>Average</option>
-            <option>Poor</option>
-          </select>
-        </div>
-
-        <div class="input-group">
-          <label>Street Light Condition</label>
-          <select id="street_light_condition" required>
-            <option value="">Select Condition</option>
-            <option>Good</option>
-            <option>Average</option>
-            <option>Poor</option>
-          </select>
-        </div>
-
-        <div class="input-group">
-          <label>Waste Collected Regularly</label>
-          <select id="waste_collected_regularly" required>
-            <option value="">Select Option</option>
-            <option>Yes</option>
-            <option>No</option>
-          </select>
-        </div>
-
-        <div class="input-group">
-          <label>Drainage Problem</label>
-          <select id="drainage_problem" required>
-            <option value="">Select Option</option>
-            <option>Yes</option>
-            <option>No</option>
-          </select>
-        </div>
-
-        <div class="input-group">
-          <label>Main Complaint</label>
-          <textarea id="main_complaint" placeholder="Enter your main complaint or feedback..."></textarea>
-        </div>
-
-        <button type="submit" id="submitBtn">
-          <span>Submit Survey</span>
-        </button>
-
-        <div class="status" id="status"></div>
-
-      </form>
+  <!-- ===== NAVIGATION ===== -->
+  <nav class="navbar">
+    <div class="nav-brand">UrbanPulse Hub</div>
+    <div class="nav-links">
+      <button class="nav-btn active" onclick="scrollToSection('home')">Home</button>
+      <button class="nav-btn" onclick="scrollToSection('quotes')">Quotes</button>
+      <button class="nav-btn" onclick="scrollToSection('impact')">Impact</button>
+      <button class="nav-btn" onclick="scrollToSection('survey')">Survey</button>
+      <button class="nav-btn" onclick="openModal('aboutModal')">About</button>
+      <button class="nav-btn" onclick="openModal('overviewModal')">Overview</button>
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">🌙</button>
     </div>
+  </nav>
 
-    <!-- PAGE 2: Innovative Success Screen with Floating Animations -->
-    <div id="successPage">
-      <div class="success-card-content">
-        <div id="confettiContainer"></div>
-        
-        <div class="success-icon-wrapper">
-          <div class="success-icon">
-            <svg viewBox="0 0 24 24">
-              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-            </svg>
-          </div>
-        </div>
-        
-        <h2>Submitted Successfully!</h2>
-        <p>Thank you for contributing to the Idikarai Development Survey. Your responses have been safely recorded.</p>
-        <button class="btn-reset" onclick="navigateToSurvey()">Fill Out Another Survey</button>
+  <!-- ===== HERO / 3D CITY ===== -->
+  <section class="hero" id="home">
+    <div id="hero-canvas"></div>
+    <div class="hero-content">
+      <h1>UrbanPulse Hub</h1>
+      <p>Smart City · Clean Environment · Better Tomorrow</p>
+      <a href="#survey" class="hero-cta" onclick="scrollToSection('survey'); return false;">Take the Survey</a>
+    </div>
+    <a href="#quotes" class="scroll-indicator" onclick="scrollToSection('quotes'); return false;">
+      <span>Explore</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M7 13l5 5 5-5M7 6l5 5 5-5"/>
+      </svg>
+    </a>
+  </section>
+
+  <!-- ===== ENVIRONMENTAL QUOTES ===== -->
+  <section class="section" id="quotes">
+    <h2 class="section-title">Voices for the Planet</h2>
+    <p class="section-subtitle">Inspiring words that drive our mission for a greener, smarter city</p>
+    <div class="quotes-grid">
+      <div class="quote-card">
+        <p class="quote-text">The Earth is what we all have in common. Protecting it is not a choice — it is a responsibility we owe to every living being that calls this planet home.</p>
+        <div class="quote-author">— Wendell Berry</div>
+      </div>
+      <div class="quote-card">
+        <p class="quote-text">We do not inherit the earth from our ancestors; we borrow it from our children. Every action we take today shapes the world they will inherit tomorrow.</p>
+        <div class="quote-author">— Native American Proverb</div>
+      </div>
+      <div class="quote-card">
+        <p class="quote-text">He that plants trees loves others beside himself. A single act of green today can breathe life into a thousand tomorrows.</p>
+        <div class="quote-author">— Thomas Fuller</div>
       </div>
     </div>
+  </section>
 
+  <!-- ===== IMPACT / PROJECT OVERCOME ===== -->
+  <section class="section" id="impact">
+    <h2 class="section-title">Overcoming Environmental Challenges</h2>
+    <p class="section-subtitle">UrbanPulse Hub transforms urban data into actionable solutions for a sustainable future</p>
+    <div class="impact-grid">
+      <div class="impact-card">
+        <img src="https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=800&auto=format&fit=crop&q=80" alt="Clean Water" class="impact-img">
+        <div class="impact-body">
+          <h3>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+            Safer Water Access
+          </h3>
+          <p>By tracking daily water availability across neighborhoods, we identify scarcity zones and help authorities prioritize pipeline repairs and supply distribution — ensuring no home goes thirsty.</p>
+        </div>
+      </div>
+      <div class="impact-card">
+        <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&auto=format&fit=crop&q=80" alt="Green City" class="impact-img">
+        <div class="impact-body">
+          <h3>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Cleaner Air & Streets
+          </h3>
+          <p>Smart waste collection tracking and drainage monitoring reduce landfill overflow and stagnant water — cutting down pollution, preventing disease, and making our streets breathable again.</p>
+        </div>
+      </div>
+      <div class="impact-card">
+        <img src="https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=800&auto=format&fit=crop&q=80" alt="Renewable Energy" class="impact-img">
+        <div class="impact-body">
+          <h3>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            Energy-Efficient Lighting
+          </h3>
+          <p>Street light condition surveys highlight dark zones and faulty infrastructure. Better lighting means safer roads, reduced accidents, and lower energy waste through targeted maintenance.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SURVEY SECTION ===== -->
+  <section class="survey-section" id="survey">
+    <div class="form-wrap">
+      <div class="form-card">
+        <div style="text-align:center;">
+          <span id="modeBadge" class="mode-badge mode-local">Local Storage Mode</span>
+        </div>
+
+        <div id="formBody">
+          <h2>Community Environmental Survey</h2>
+          <form id="surveyForm">
+            <div class="row">
+              <div class="field">
+                <label>Street Name</label>
+                <select id="street_name" required>
+                  <option value="">Select Street</option>
+                  <option>Idigarai</option>
+                  <option>Idigarai Main Road</option>
+                  <option>Vadakku Thotta Paguthi</option>
+                  <option>Therkku Thotta Paguthi</option>
+                  <option>Star Residency</option>
+                  <option>Gem Enclave</option>
+                  <option>Meharaj Nagar</option>
+                  <option>Balaji Garden</option>
+                  <option>Golden Villa</option>
+                  <option>Nethaji Street</option>
+                  <option>Karupparayan Kovil Street</option>
+                  <option>Sri Ram Nagar</option>
+                  <option>Periyar Nagar</option>
+                  <option>A.G. Nagar</option>
+                  <option>E.B. Colony</option>
+                  <option>Ramachandra Nagar</option>
+                  <option>Perumal Kovil Street</option>
+                  <option>Harijana Colony</option>
+                  <option>Nandhavana Street</option>
+                  <option>Raj Avenue</option>
+                  <option>Apple Garden</option>
+                  <option>Bharath Nagar</option>
+                  <option>Maniakaranpalayam</option>
+                  <option>Sastha Nagar</option>
+                  <option>R.M.R. Garden</option>
+                  <option>Serene Apartment</option>
+                  <option>Sankar Nagar</option>
+                  <option>Fortland U Foria</option>
+                  <option>Ramanuja Nagar</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>People in House</label>
+                <input type="number" id="people_in_house" placeholder="Enter number" required min="1">
+              </div>
+            </div>
+            <div class="row">
+              <div class="field">
+                <label>Water Available Daily</label>
+                <select id="water_available_daily" required>
+                  <option value="">Select</option>
+                  <option>Yes</option>
+                  <option>No</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Road Condition</label>
+                <select id="road_condition" required>
+                  <option value="">Select</option>
+                  <option>Good</option>
+                  <option>Average</option>
+                  <option>Poor</option>
+                </select>
+              </div>
+            </div>
+            <div class="row">
+              <div class="field">
+                <label>Street Light Condition</label>
+                <select id="street_light_condition" required>
+                  <option value="">Select</option>
+                  <option>Good</option>
+                  <option>Average</option>
+                  <option>Poor</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Waste Collected Regularly</label>
+                <select id="waste_collected_regularly" required>
+                  <option value="">Select</option>
+                  <option>Yes</option>
+                  <option>No</option>
+                </select>
+              </div>
+            </div>
+            <div class="row">
+              <div class="field">
+                <label>Drainage Problem</label>
+                <select id="drainage_problem" required>
+                  <option value="">Select</option>
+                  <option>Yes</option>
+                  <option>No</option>
+                </select>
+              </div>
+              <div class="field"></div>
+            </div>
+
+            <div class="field complaint-field">
+              <label>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle; margin-right:6px;">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                Main Complaint
+              </label>
+              <textarea id="main_complaint" placeholder="Describe the issue in detail... (e.g., water shortage, broken street lights, drainage blockage)"></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">Submit Survey</button>
+            <div class="status" id="status"></div>
+            <div style="text-align:center;">
+              <button type="button" class="btn-view" onclick="openDataViewer()">View Saved Surveys</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="success-view" id="successView">
+          <div class="success-icon">
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+          </div>
+          <h3>Submitted Successfully!</h3>
+          <p>Thank you for contributing to the UrbanPulse Hub survey.</p>
+          <button class="btn-secondary" onclick="resetForm()">Submit Another</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    UrbanPulse Hub © 2026 · Built for a Greener Tomorrow · Smart City Development Initiative
+  </footer>
+
+  <!-- ===== ABOUT MODAL ===== -->
+  <div id="aboutModal" class="modal-overlay" onclick="closeModal(event, 'aboutModal')">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModal(null, 'aboutModal')">&times;</button>
+      <h2>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        About UrbanPulse Hub
+      </h2>
+      <p><strong>UrbanPulse Hub</strong> is a community-driven Smart City Development Survey platform designed to collect real-time data about urban infrastructure conditions at the grassroots level.</p>
+      <h3>What We Do</h3>
+      <ul>
+        <li>Collect structured data on water supply, road conditions, street lighting, waste management, and drainage issues</li>
+        <li>Empower residents to voice their concerns through a simple, accessible digital form</li>
+        <li>Aggregate survey data to help local authorities prioritize development projects</li>
+        <li>Enable data-driven decision making for smarter urban planning</li>
+      </ul>
+      <h3>How It Works</h3>
+      <ul>
+        <li>Residents fill out a quick survey about their street's infrastructure</li>
+        <li>Data is stored securely (locally or via Supabase cloud database)</li>
+        <li>Survey results can be viewed and analyzed for actionable insights</li>
+        <li>Authorities can identify problem areas and allocate resources efficiently</li>
+      </ul>
+      <h3>Technology</h3>
+      <p>Built with modern web technologies including HTML5, CSS3, JavaScript, Three.js 3D rendering, and Supabase for real-time data storage. The platform features an interactive 3D animated cityscape, particle effects, light/dark theme, and a responsive glassmorphism UI.</p>
+    </div>
+  </div>
+
+  <!-- ===== OVERVIEW / BENEFITS MODAL ===== -->
+  <div id="overviewModal" class="modal-overlay" onclick="closeModal(event, 'overviewModal')">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModal(null, 'overviewModal')">&times;</button>
+      <h2>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+        </svg>
+        Project Benefits & Overview
+      </h2>
+      <p>UrbanPulse Hub transforms how communities interact with urban development by bridging the gap between citizens and local governance.</p>
+      <h3>Key Benefits</h3>
+      <ul>
+        <li><strong>Real-Time Data Collection:</strong> Instant gathering of infrastructure status across multiple streets and neighborhoods</li>
+        <li><strong>Transparent Governance:</strong> Open data visibility helps build trust between residents and authorities</li>
+        <li><strong>Rapid Issue Identification:</strong> Pinpoint exact locations with drainage, lighting, or road problems</li>
+        <li><strong>Resource Optimization:</strong> Help authorities prioritize repairs based on actual community needs</li>
+        <li><strong>Community Empowerment:</strong> Every resident's voice contributes to neighborhood improvement</li>
+        <li><strong>Digital Accessibility:</strong> Works on any device — mobile, tablet, or desktop</li>
+        <li><strong>Zero Paperwork:</strong> Completely digital survey process saves time and environment</li>
+        <li><strong>Historical Tracking:</strong> Monitor improvement over time with stored survey records</li>
+      </ul>
+      <h3>Impact Areas</h3>
+      <ul>
+        <li>Water Supply Management</li>
+        <li>Road Maintenance & Safety</li>
+        <li>Street Lighting Coverage</li>
+        <li>Waste Collection Efficiency</li>
+        <li>Drainage & Flood Prevention</li>
+        <li>Public Health & Sanitation</li>
+      </ul>
+      <h3>Vision</h3>
+      <p>To create a digitally connected community where every citizen plays an active role in shaping their city's future — one survey at a time.</p>
+    </div>
+  </div>
+
+  <!-- ===== DATA VIEWER MODAL ===== -->
+  <div id="dataModal" onclick="closeDataViewer(event)">
+    <div class="modal-box data-box" onclick="event.stopPropagation()">
+      <h3>Saved Surveys <button class="close-btn" onclick="closeDataViewer()">&times;</button></h3>
+      <div id="dataList"></div>
+    </div>
   </div>
 
   <script>
-    const SUPABASE_URL = "https://ifrmyjdexwxlrosywnpd.supabase.co";
+    // ==================== PASTE YOUR KEYS HERE ====================
+    const SUPABASE_URL = "ttps://ifrmyjdexwxlrosywnpd.supabase.co";
     const SUPABASE_KEY = "sb_publishable_WwKyyYMkTm2TgGHHbrFCEw_gLyiwj3b";
+    // =============================================================
 
-    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    let client = null;
+    let useSupabase = false;
 
-    const form = document.getElementById("surveyForm");
-    const status = document.getElementById("status");
-    const submitBtn = document.getElementById("submitBtn");
-    
-    const surveyPage = document.getElementById("surveyPage");
-    const successPage = document.getElementById("successPage");
+    if (SUPABASE_URL && SUPABASE_KEY) {
+      try {
+        client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        useSupabase = true;
+        document.getElementById('modeBadge').textContent = 'Live Database Mode';
+        document.getElementById('modeBadge').className = 'mode-badge mode-live';
+      } catch (e) {
+        console.warn('Supabase failed, using localStorage');
+      }
+    }
 
-    form.addEventListener("submit", async (e) => {
+    // ==================== THEME TOGGLE ====================
+    function toggleTheme() {
+      const body = document.body;
+      const btn = document.querySelector('.theme-toggle');
+      const isDark = body.getAttribute('data-theme') === 'dark';
+      
+      if (isDark) {
+        body.setAttribute('data-theme', 'light');
+        btn.textContent = '☀️';
+        updateThreeJsTheme('light');
+      } else {
+        body.setAttribute('data-theme', 'dark');
+        btn.textContent = '🌙';
+        updateThreeJsTheme('dark');
+      }
+    }
+
+    // ==================== NAVIGATION ====================
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        event.target.classList.add('active');
+      }
+    }
+
+    function openModal(modalId) {
+      document.getElementById(modalId).classList.add('active');
+    }
+
+    function closeModal(e, modalId) {
+      if (!e || e.target.id === modalId) {
+        document.getElementById(modalId).classList.remove('active');
+      }
+    }
+
+    // ==================== THREE.JS 3D CITY ====================
+    let scene, camera, renderer, buildings = [], particles, cityLights = [];
+    let mouseX = 0, mouseY = 0;
+
+    function initThreeJS() {
+      const container = document.getElementById('hero-canvas');
+      const w = container.clientWidth || window.innerWidth;
+      const h = container.clientHeight || window.innerHeight;
+
+      scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x020408, 0.035);
+
+      camera = new THREE.PerspectiveCamera(60, w / h, 0.1, 1000);
+      camera.position.set(0, 12, 28);
+
+      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      renderer.setSize(w, h);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(renderer.domElement);
+
+      // Lights
+      const ambientLight = new THREE.AmbientLight(0x404060, 1.5);
+      scene.add(ambientLight);
+
+      const moonLight = new THREE.DirectionalLight(0x00f0ff, 0.5);
+      moonLight.position.set(20, 30, 10);
+      scene.add(moonLight);
+
+      // Ground grid
+      const gridHelper = new THREE.GridHelper(80, 80, 0x00f0ff, 0x0a1a2a);
+      gridHelper.position.y = 0;
+      scene.add(gridHelper);
+
+      const groundGeo = new THREE.PlaneGeometry(200, 200);
+      const groundMat = new THREE.MeshStandardMaterial({ 
+        color: 0x050a10, 
+        roughness: 0.9, 
+        metalness: 0.1 
+      });
+      const ground = new THREE.Mesh(groundGeo, groundMat);
+      ground.rotation.x = -Math.PI / 2;
+      ground.position.y = -0.1;
+      scene.add(ground);
+
+      // Buildings
+      const buildingMat = new THREE.MeshStandardMaterial({
+        color: 0x0f172a,
+        roughness: 0.3,
+        metalness: 0.7
+      });
+
+      const windowMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff });
+      const windowMat2 = new THREE.MeshBasicMaterial({ color: 0x39ff14 });
+      const windowMat3 = new THREE.MeshBasicMaterial({ color: 0x0ea5e9 });
+
+      for (let i = 0; i < 60; i++) {
+        const bh = Math.random() * 10 + 2;
+        const bw = Math.random() * 1.5 + 0.8;
+        const bd = Math.random() * 1.5 + 0.8;
+        
+        const geo = new THREE.BoxGeometry(bw, bh, bd);
+        const mesh = new THREE.Mesh(geo, buildingMat.clone());
+        
+        const x = (Math.random() - 0.5) * 50;
+        const z = (Math.random() - 0.5) * 50;
+        
+        if (Math.abs(x) < 4 && Math.abs(z) < 4) continue;
+        
+        mesh.position.set(x, bh / 2, z);
+        buildings.push(mesh);
+        scene.add(mesh);
+
+        // Windows
+        const winCount = Math.floor(bh * 1.5);
+        for (let j = 0; j < winCount; j++) {
+          const winGeo = new THREE.PlaneGeometry(0.12, 0.12);
+          const mats = [windowMat, windowMat2, windowMat3];
+          const win = new THREE.Mesh(winGeo, mats[Math.floor(Math.random() * 3)]);
+          
+          const side = Math.floor(Math.random() * 4);
+          const yPos = (j / winCount) * bh * 0.8 + 0.5;
+          
+          switch(side) {
+            case 0: win.position.set(x + bw/2 + 0.01, yPos, z + (Math.random()-0.5)*bd*0.6); win.rotation.y = Math.PI/2; break;
+            case 1: win.position.set(x - bw/2 - 0.01, yPos, z + (Math.random()-0.5)*bd*0.6); win.rotation.y = -Math.PI/2; break;
+            case 2: win.position.set(x + (Math.random()-0.5)*bw*0.6, yPos, z + bd/2 + 0.01); break;
+            case 3: win.position.set(x + (Math.random()-0.5)*bw*0.6, yPos, z - bd/2 - 0.01); win.rotation.y = Math.PI; break;
+          }
+          scene.add(win);
+        }
+      }
+
+      // Central Tower
+      const towerGeo = new THREE.BoxGeometry(2, 18, 2);
+      const towerMat = new THREE.MeshStandardMaterial({
+        color: 0x1e293b,
+        roughness: 0.2,
+        metalness: 0.8,
+        emissive: 0x00f0ff,
+        emissiveIntensity: 0.1
+      });
+      const tower = new THREE.Mesh(towerGeo, towerMat);
+      tower.position.set(0, 9, 0);
+      scene.add(tower);
+
+      // Tower beacon
+      const beaconGeo = new THREE.SphereGeometry(0.3, 16, 16);
+      const beaconMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff });
+      const beacon = new THREE.Mesh(beaconGeo, beaconMat);
+      beacon.position.set(0, 18.5, 0);
+      scene.add(beacon);
+
+      // Floating particles
+      const partGeo = new THREE.BufferGeometry();
+      const partCount = 300;
+      const posArray = new Float32Array(partCount * 3);
+      for (let i = 0; i < partCount * 3; i++) {
+        posArray[i] = (Math.random() - 0.5) * 60;
+      }
+      partGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+      const partMat = new THREE.PointsMaterial({
+        size: 0.08,
+        color: 0x00f0ff,
+        transparent: true,
+        opacity: 0.6
+      });
+      particles = new THREE.Points(partGeo, partMat);
+      scene.add(particles);
+
+      // Street lights
+      for (let i = 0; i < 8; i++) {
+        const light = new THREE.PointLight(0x39ff14, 0.5, 15);
+        light.position.set(
+          (Math.random() - 0.5) * 30,
+          0.5,
+          (Math.random() - 0.5) * 30
+        );
+        scene.add(light);
+        cityLights.push(light);
+        
+        const bulbGeo = new THREE.SphereGeometry(0.1, 8, 8);
+        const bulbMat = new THREE.MeshBasicMaterial({ color: 0x39ff14 });
+        const bulb = new THREE.Mesh(bulbGeo, bulbMat);
+        bulb.position.copy(light.position);
+        scene.add(bulb);
+      }
+
+      // Mouse tracking
+      document.addEventListener('mousemove', (e) => {
+        mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+        mouseY = (e.clientY / window.innerHeight) * 2 - 1;
+      });
+
+      window.addEventListener('resize', onWindowResize);
+      animate();
+    }
+
+    function onWindowResize() {
+      const container = document.getElementById('hero-canvas');
+      const w = container.clientWidth || window.innerWidth;
+      const h = container.clientHeight || window.innerHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      
+      const time = Date.now() * 0.0003;
+      
+      // Orbit camera
+      const radius = 28;
+      camera.position.x = Math.sin(time) * radius + mouseX * 3;
+      camera.position.z = Math.cos(time) * radius + mouseY * 2;
+      camera.position.y = 12 + Math.sin(time * 0.5) * 2;
+      camera.lookAt(0, 6, 0);
+
+      // Animate particles
+      if (particles) {
+        particles.rotation.y = time * 0.1;
+        const positions = particles.geometry.attributes.position.array;
+        for (let i = 1; i < positions.length; i += 3) {
+          positions[i] += Math.sin(time + positions[i-1]) * 0.01;
+        }
+        particles.geometry.attributes.position.needsUpdate = true;
+      }
+
+      // Pulse tower beacon
+      const beacon = scene.children.find(c => c.geometry && c.geometry.type === 'SphereGeometry' && c.position.y > 15);
+      if (beacon) {
+        beacon.material.opacity = 0.5 + Math.sin(time * 3) * 0.5;
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    function updateThreeJsTheme(theme) {
+      if (!scene || !renderer) return;
+      if (theme === 'light') {
+        scene.fog.color.setHex(0xe0e7ff);
+        renderer.setClearColor(0xe0e7ff, 0.3);
+        scene.children.forEach(child => {
+          if (child.material && child.geometry && child.geometry.type === 'PlaneGeometry') {
+            child.material.color.setHex(0xd1d5db);
+          }
+          if (child.type === 'GridHelper') {
+            child.material.color.setHex(0x0284c7);
+          }
+        });
+      } else {
+        scene.fog.color.setHex(0x020408);
+        renderer.setClearColor(0x000000, 0);
+        scene.children.forEach(child => {
+          if (child.material && child.geometry && child.geometry.type === 'PlaneGeometry') {
+            child.material.color.setHex(0x050a10);
+          }
+          if (child.type === 'GridHelper') {
+            child.material.color.setHex(0x00f0ff);
+          }
+        });
+      }
+    }
+
+    // ==================== FORM HANDLING ====================
+    const form = document.getElementById('surveyForm');
+    const status = document.getElementById('status');
+    const submitBtn = document.getElementById('submitBtn');
+    const formBody = document.getElementById('formBody');
+    const successView = document.getElementById('successView');
+
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-
-      status.style.color = "#93c5fd";
-      status.innerHTML = "⏳ Submitting data...";
-      submitBtn.style.opacity = "0.6";
+      status.style.color = '#60a5fa';
+      status.textContent = 'Submitting...';
       submitBtn.disabled = true;
 
       try {
         const data = {
-          street_name: document.getElementById("street_name").value,
-          people_in_house: parseInt(document.getElementById("people_in_house").value),
-          water_available_daily: document.getElementById("water_available_daily").value,
-          road_condition: document.getElementById("road_condition").value,
-          street_light_condition: document.getElementById("street_light_condition").value,
-          waste_collected_regularly: document.getElementById("waste_collected_regularly").value,
-          drainage_problem: document.getElementById("drainage_problem").value,
-          main_complaint: document.getElementById("main_complaint").value
+          street_name: document.getElementById('street_name').value.trim(),
+          people_in_house: parseInt(document.getElementById('people_in_house').value),
+          water_available_daily: document.getElementById('water_available_daily').value,
+          road_condition: document.getElementById('road_condition').value,
+          street_light_condition: document.getElementById('street_light_condition').value,
+          waste_collected_regularly: document.getElementById('waste_collected_regularly').value,
+          drainage_problem: document.getElementById('drainage_problem').value,
+          main_complaint: document.getElementById('main_complaint').value.trim(),
+          submited_on: new Date().toISOString()
         };
 
-        const { error } = await client
-          .from("smart_city_survey")
-          .insert([data]);
-
-        if (error) {
-          throw error;
+        if (useSupabase && client) {
+          const { error } = await client.from('smart_city_survey').insert([data]);
+          if (error) throw error;
+        } else {
+          const surveys = JSON.parse(localStorage.getItem('urbanpulse_surveys') || '[]');
+          surveys.push(data);
+          localStorage.setItem('urbanpulse_surveys', JSON.stringify(surveys));
         }
 
-        // Reset form & status
         form.reset();
-        status.innerHTML = "";
-
-        // SWITCH VIEW
-        surveyPage.style.display = "none";
-        successPage.style.display = "block";
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-
-        // Trigger Confetti Burst Animation
-        triggerConfetti();
-
+        status.textContent = '';
+        formBody.style.display = 'none';
+        successView.style.display = 'block';
       } catch (err) {
-        status.style.color = "#fca5a5";
-        status.innerHTML = "❌ " + (err.message || "Failed to submit. Please try again.");
+        status.style.color = '#f87171';
+        status.textContent = '❌ ' + (err.message || 'Failed to submit. Try again.');
       } finally {
-        submitBtn.style.opacity = "1";
         submitBtn.disabled = false;
       }
     });
 
-    function triggerConfetti() {
-      const container = document.getElementById("confettiContainer");
-      container.innerHTML = "";
-      
-      const colors = ['#22c55e', '#60a5fa', '#a855f7', '#fbbf24', '#f43f5e'];
-      
-      for (let i = 0; i < 30; i++) {
-        const particle = document.createElement("div");
-        particle.className = "confetti";
-        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-        
-        const angle = Math.random() * Math.PI * 2;
-        const distance = 80 + Math.random() * 100;
-        const tx = Math.cos(angle) * distance;
-        const ty = Math.sin(angle) * distance;
-        
-        particle.style.transition = `transform 1s cubic-bezier(0.1, 1, 0.3, 1), opacity 1s ease`;
-        container.appendChild(particle);
-        
-        setTimeout(() => {
-          particle.style.opacity = '1';
-          particle.style.transform = `translate(${tx}px, ${ty}px) scale(${Math.random() * 1.8 + 0.6}) rotate(${Math.random() * 360}deg)`;
-        }, 20);
+    function resetForm() {
+      successView.style.display = 'none';
+      formBody.style.display = 'block';
+    }
 
-        setTimeout(() => {
-          particle.style.opacity = '0';
-        }, 800);
+    // ==================== DATA VIEWER ====================
+    function openDataViewer() {
+      const list = document.getElementById('dataList');
+      const surveys = JSON.parse(localStorage.getItem('urbanpulse_surveys') || '[]');
+      if (surveys.length === 0) {
+        list.innerHTML = '<div class="empty">No surveys saved yet.</div>';
+      } else {
+        list.innerHTML = surveys.slice().reverse().map(entry => `
+          <div class="entry">
+            <div class="entry-header">
+              <span>${escapeHtml(entry.street_name)}</span>
+              <span class="entry-time">${formatDate(entry.submited_on)}</span>
+            </div>
+            <div class="entry-grid">
+              <span>People: ${entry.people_in_house}</span>
+              <span>Water: ${entry.water_available_daily}</span>
+              <span>Road: ${entry.road_condition}</span>
+              <span>Lights: ${entry.street_light_condition}</span>
+              <span>Waste: ${entry.waste_collected_regularly}</span>
+              <span>Drainage: ${entry.drainage_problem}</span>
+            </div>
+            ${entry.main_complaint ? `<div class="entry-complaint">"${escapeHtml(entry.main_complaint)}"</div>` : ''}
+          </div>
+        `).join('');
+      }
+      document.getElementById('dataModal').style.display = 'flex';
+    }
+
+    function closeDataViewer(e) {
+      if (!e || e.target.id === 'dataModal') {
+        document.getElementById('dataModal').style.display = 'none';
       }
     }
 
-    function navigateToSurvey() {
-      successPage.style.display = "none";
-      surveyPage.style.display = "block";
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    function escapeHtml(text) {
+      if (!text) return '';
+      const d = document.createElement('div');
+      d.textContent = text;
+      return d.innerHTML;
     }
-  </script>
 
+    function formatDate(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      return d.toLocaleString('en-IN', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    }
+
+    // ==================== INIT ====================
+    window.addEventListener('DOMContentLoaded', () => {
+      initThreeJS();
+    });
+  </script>
 </body>
 </html>
