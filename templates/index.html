@@ -1062,47 +1062,52 @@
       <div class="form-card">
         <div style="text-align:center;">
           <span id="modeBadge" class="mode-badge mode-local">Local Storage Mode</span>
-        </div>
+     <div class="row">
+  <div class="field" style="grid-column: 1 / -1;">
+    <label>Street Name</label>
+    <select id="street_name" required onchange="toggleOtherStreet(this.value)">
+      <option value="">Select Street</option>
+      <option>Idigarai</option>
+      <option>Idigarai Main Road</option>
+      <option>Vadakku Thotta Paguthi</option>
+      <option>Therkku Thotta Paguthi</option>
+      <option>Star Residency</option>
+      <option>Gem Enclave</option>
+      <option>Meharaj Nagar</option>
+      <option>Balaji Garden</option>
+      <option>Golden Villa</option>
+      <option>Nethaji Street</option>
+      <option>Karupparayan Kovil Street</option>
+      <option>Sri Ram Nagar</option>
+      <option>Periyar Nagar</option>
+      <option>A.G. Nagar</option>
+      <option>E.B. Colony</option>
+      <option>Ramachandra Nagar</option>
+      <option>Perumal Kovil Street</option>
+      <option>Harijana Colony</option>
+      <option>Nandhavana Street</option>
+      <option>Raj Avenue</option>
+      <option>Apple Garden</option>
+      <option>Bharath Nagar</option>
+      <option>Maniakaranpalayam</option>
+      <option>Sastha Nagar</option>
+      <option>R.M.R. Garden</option>
+      <option>Serene Apartment</option>
+      <option>Sankar Nagar</option>
+      <option>Fortland U Foria</option>
+      <option>Ramanuja Nagar</option>
+      <option value="Other">Other (Type your street)</option>
+    </select>
+  </div>
+</div>
 
-        <div id="formBody">
-          <h2>Community Environmental Survey</h2>
-          <form id="surveyForm">
-            <div class="row">
-              <div class="field">
-                <label>Street Name</label>
-                <select id="street_name" required>
-                  <option value="">Select Street</option>
-                  <option>Idigarai</option>
-                  <option>Idigarai Main Road</option>
-                  <option>Vadakku Thotta Paguthi</option>
-                  <option>Therkku Thotta Paguthi</option>
-                  <option>Star Residency</option>
-                  <option>Gem Enclave</option>
-                  <option>Meharaj Nagar</option>
-                  <option>Balaji Garden</option>
-                  <option>Golden Villa</option>
-                  <option>Nethaji Street</option>
-                  <option>Karupparayan Kovil Street</option>
-                  <option>Sri Ram Nagar</option>
-                  <option>Periyar Nagar</option>
-                  <option>A.G. Nagar</option>
-                  <option>E.B. Colony</option>
-                  <option>Ramachandra Nagar</option>
-                  <option>Perumal Kovil Street</option>
-                  <option>Harijana Colony</option>
-                  <option>Nandhavana Street</option>
-                  <option>Raj Avenue</option>
-                  <option>Apple Garden</option>
-                  <option>Bharath Nagar</option>
-                  <option>Maniakaranpalayam</option>
-                  <option>Sastha Nagar</option>
-                  <option>R.M.R. Garden</option>
-                  <option>Serene Apartment</option>
-                  <option>Sankar Nagar</option>
-                  <option>Fortland U Foria</option>
-                  <option>Ramanuja Nagar</option>
-                </select>
-              </div>
+<!-- Hidden Other Street Input -->
+<div class="row" id="otherStreetRow" style="display: none;">
+  <div class="field" style="grid-column: 1 / -1;">
+    <label>Your Street Name</label>
+    <input type="text" id="other_street_name" placeholder="Type your street name here..." maxlength="100">
+  </div>
+</div>
               <div class="field">
                 <label>People in House</label>
                 <input type="number" id="people_in_house" placeholder="Enter number" required min="1">
