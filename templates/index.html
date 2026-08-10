@@ -1062,124 +1062,119 @@
       <div class="form-card">
         <div style="text-align:center;">
           <span id="modeBadge" class="mode-badge mode-local">Local Storage Mode</span>
-     <div class="row">
-  <div class="field" style="grid-column: 1 / -1;">
-    <label>Street Name</label>
-    <select id="street_name" required onchange="toggleOtherStreet(this.value)">
-      <option value="">Select Street</option>
-      <option>Idigarai</option>
-      <option>Idigarai Main Road</option>
-      <option>Vadakku Thotta Paguthi</option>
-      <option>Therkku Thotta Paguthi</option>
-      <option>Star Residency</option>
-      <option>Gem Enclave</option>
-      <option>Meharaj Nagar</option>
-      <option>Balaji Garden</option>
-      <option>Golden Villa</option>
-      <option>Nethaji Street</option>
-      <option>Karupparayan Kovil Street</option>
-      <option>Sri Ram Nagar</option>
-      <option>Periyar Nagar</option>
-      <option>A.G. Nagar</option>
-      <option>E.B. Colony</option>
-      <option>Ramachandra Nagar</option>
-      <option>Perumal Kovil Street</option>
-      <option>Harijana Colony</option>
-      <option>Nandhavana Street</option>
-      <option>Raj Avenue</option>
-      <option>Apple Garden</option>
-      <option>Bharath Nagar</option>
-      <option>Maniakaranpalayam</option>
-      <option>Sastha Nagar</option>
-      <option>R.M.R. Garden</option>
-      <option>Serene Apartment</option>
-      <option>Sankar Nagar</option>
-      <option>Fortland U Foria</option>
-      <option>Ramanuja Nagar</option>
-      <option value="Other">Other (Type your street)</option>
-    </select>
-  </div>
-</div>
-
-<!-- Hidden Other Street Input -->
-<div class="row" id="otherStreetRow" style="display: none;">
-  <div class="field" style="grid-column: 1 / -1;">
-    <label>Your Street Name</label>
-    <input type="text" id="other_street_name" placeholder="Type your street name here..." maxlength="100">
-  </div>
-</div>
-              <div class="field">
-                <label>People in House</label>
-                <input type="number" id="people_in_house" placeholder="Enter number" required min="1">
-              </div>
-            </div>
-            <div class="row">
-              <div class="field">
-                <label>Water Available Daily</label>
-                <select id="water_available_daily" required>
-                  <option value="">Select</option>
-                  <option>Yes</option>
-                  <option>No</option>
-                </select>
-              </div>
-              <div class="field">
-                <label>Road Condition</label>
-                <select id="road_condition" required>
-                  <option value="">Select</option>
-                  <option>Good</option>
-                  <option>Average</option>
-                  <option>Poor</option>
-                </select>
-              </div>
-            </div>
-            <div class="row">
-              <div class="field">
-                <label>Street Light Condition</label>
-                <select id="street_light_condition" required>
-                  <option value="">Select</option>
-                  <option>Good</option>
-                  <option>Average</option>
-                  <option>Poor</option>
-                </select>
-              </div>
-              <div class="field">
-                <label>Waste Collected Regularly</label>
-                <select id="waste_collected_regularly" required>
-                  <option value="">Select</option>
-                  <option>Yes</option>
-                  <option>No</option>
-                </select>
-              </div>
-            </div>
-            <div class="row">
-              <div class="field">
-                <label>Drainage Problem</label>
-                <select id="drainage_problem" required>
-                  <option value="">Select</option>
-                  <option>Yes</option>
-                  <option>No</option>
-                </select>
-              </div>
-              <div class="field"></div>
-            </div>
-
-            <div class="field complaint-field">
-              <label>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle; margin-right:6px;">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                </svg>
-                Main Complaint
-              </label>
-              <textarea id="main_complaint" placeholder="Describe the issue in detail... (e.g., water shortage, broken street lights, drainage blockage)"></textarea>
-            </div>
-
-            <button type="submit" class="submit-btn" id="submitBtn">Submit Survey</button>
-            <div class="status" id="status"></div>
-            <div style="text-align:center;">
-              <button type="button" class="btn-view" onclick="openDataViewer()">View Saved Surveys</button>
-            </div>
-          </form>
         </div>
+        <form id="surveyForm">
+          <div class="row">
+            <div class="field">
+              <label>Street Name</label>
+              <select id="street_name" required onchange="toggleOtherStreet(this.value)">
+                <option value="">Select Street</option>
+                <option>Idigarai</option>
+                <option>Idigarai Main Road</option>
+                <option>Vadakku Thotta Paguthi</option>
+                <option>Therkku Thotta Paguthi</option>
+                <option>Star Residency</option>
+                <option>Gem Enclave</option>
+                <option>Meharaj Nagar</option>
+                <option>Balaji Garden</option>
+                <option>Golden Villa</option>
+                <option>Nethaji Street</option>
+                <option>Karupparayan Kovil Street</option>
+                <option>Sri Ram Nagar</option>
+                <option>Periyar Nagar</option>
+                <option>A.G. Nagar</option>
+                <option>E.B. Colony</option>
+                <option>Ramachandra Nagar</option>
+                <option>Perumal Kovil Street</option>
+                <option>Harijana Colony</option>
+                <option>Nandhavana Street</option>
+                <option>Raj Avenue</option>
+                <option>Apple Garden</option>
+                <option>Bharath Nagar</option>
+                <option>Maniakaranpalayam</option>
+                <option>Sastha Nagar</option>
+                <option>R.M.R. Garden</option>
+                <option>Serene Apartment</option>
+                <option>Sankar Nagar</option>
+                <option>Fortland U Foria</option>
+                <option>Ramanuja Nagar</option>
+                <option value="Other">Other (Type your street)</option>
+              </select>
+              <input type="text" id="other_street_name" placeholder="Type your street name..." 
+                     style="display:none; margin-top:10px; width:100%; padding:12px 14px; border:1px solid var(--border); border-radius:12px; background:var(--input-bg); color:var(--text-primary); font-size:16px; outline:none; font-family:inherit;" 
+                     maxlength="100">
+            </div>
+            <div class="field">
+              <label>People in House</label>
+              <input type="number" id="people_in_house" placeholder="Enter number" required min="1">
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label>Water Available Daily</label>
+              <select id="water_available_daily" required>
+                <option value="">Select</option>
+                <option>Yes</option>
+                <option>No</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Road Condition</label>
+              <select id="road_condition" required>
+                <option value="">Select</option>
+                <option>Good</option>
+                <option>Average</option>
+                <option>Poor</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label>Street Light Condition</label>
+              <select id="street_light_condition" required>
+                <option value="">Select</option>
+                <option>Good</option>
+                <option>Average</option>
+                <option>Poor</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Waste Collected Regularly</label>
+              <select id="waste_collected_regularly" required>
+                <option value="">Select</option>
+                <option>Yes</option>
+                <option>No</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label>Drainage Problem</label>
+              <select id="drainage_problem" required>
+                <option value="">Select</option>
+                <option>Yes</option>
+                <option>No</option>
+              </select>
+            </div>
+            <div class="field"></div>
+          </div>
+
+          <div class="field complaint-field">
+            <label>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle; margin-right:6px;">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+              Main Complaint
+            </label>
+            <textarea id="main_complaint" placeholder="Describe the issue in detail... (e.g., water shortage, broken street lights, drainage blockage)"></textarea>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitBtn">Submit Survey</button>
+          <div class="status" id="status"></div>
+          <div style="text-align:center;">
+            <button type="button" class="btn-view" onclick="openDataViewer()">View Saved Surveys</button>
+          </div>
+        </form>
 
         <div class="success-view" id="successView">
           <div class="success-icon">
@@ -1291,6 +1286,15 @@
         document.getElementById('modeBadge').className = 'mode-badge mode-live';
       } catch (e) {
         console.warn('Supabase failed, using localStorage');
+      }
+    }
+
+    // ==================== OTHER STREET TOGGLE ====================
+    function toggleOtherStreet(val) {
+      const otherInput = document.getElementById('other_street_name');
+      if (otherInput) {
+        otherInput.style.display = (val === 'Other') ? 'block' : 'none';
+        if (val !== 'Other') otherInput.value = '';
       }
     }
 
@@ -1587,7 +1591,6 @@
     const form = document.getElementById('surveyForm');
     const status = document.getElementById('status');
     const submitBtn = document.getElementById('submitBtn');
-    const formBody = document.getElementById('formBody');
     const successView = document.getElementById('successView');
 
     form.addEventListener('submit', async (e) => {
@@ -1598,7 +1601,9 @@
 
       try {
         const data = {
-          street_name: document.getElementById('street_name').value.trim(),
+          street_name: (document.getElementById('street_name').value === 'Other' 
+            ? document.getElementById('other_street_name').value.trim() 
+            : document.getElementById('street_name').value.trim()),
           people_in_house: parseInt(document.getElementById('people_in_house').value),
           water_available_daily: document.getElementById('water_available_daily').value,
           road_condition: document.getElementById('road_condition').value,
@@ -1608,7 +1613,7 @@
           main_complaint: document.getElementById('main_complaint').value.trim(),
           submited_on: new Date().toISOString()
         };
-
+        
         if (useSupabase && client) {
           const { error } = await client.from('smart_city_survey').insert([data]);
           if (error) throw error;
@@ -1620,7 +1625,7 @@
 
         form.reset();
         status.textContent = '';
-        formBody.style.display = 'none';
+        form.style.display = 'none';
         successView.style.display = 'block';
       } catch (err) {
         status.style.color = '#f87171';
@@ -1632,7 +1637,7 @@
 
     function resetForm() {
       successView.style.display = 'none';
-      formBody.style.display = 'block';
+      form.style.display = 'block';
     }
 
     // ==================== DATA VIEWER ====================
@@ -1684,7 +1689,7 @@
       return d.toLocaleString('en-IN', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
     }
 
-   // ==================== INIT ====================
+    // ==================== INIT ====================
     window.addEventListener('DOMContentLoaded', () => {
       initThreeJS();
     });
